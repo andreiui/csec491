@@ -17,10 +17,10 @@
 url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series"
 
 # Filenames definition for raw data
-fns=("time_series_covid19_confirmed_US.csv"     \
-     "time_series_covid19_confirmed_global.csv" \
-     "time_series_covid19_deaths_US.csv"        \
-     "time_series_covid19_deaths_global.csv"    \
+fns=("time_series_covid19_confirmed_US.csv"      \
+     "time_series_covid19_confirmed_global.csv"  \
+     "time_series_covid19_deaths_US.csv"         \
+     "time_series_covid19_deaths_global.csv"     \
      "time_series_covid19_recovered_global.csv")
 
 # Download each raw file into directory
