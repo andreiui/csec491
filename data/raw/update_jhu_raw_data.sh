@@ -2,8 +2,9 @@
 
 #
 # Script for downloading and updating the raw time
-# series for VOID-19 from the JHU GitHub repository
+# series for COVID-19 from the JHU GitHub repository
 # available at github.com/CSSEGISandData/COVID-19.
+# COVID-19 data starts on January 20, 2020.
 #
 # When running this script, manually update the
 # sources file snapshot date and time.
