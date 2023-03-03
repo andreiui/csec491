@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 """
-TBD
+Python script for generating Caribbean COVID-19
+confirmed cases and deaths from the JHU raw files.
 --------------------------------------------------
 Created on 02/28/2023. Last updated on 03/02/2023.
 Written by Andrei Pascu, Yale College '23.
@@ -51,60 +52,67 @@ US_TERRITORIES: set[str] = set([
 # following the *_global.csv format
 if __name__ == "__main__":
     for gen_fn, (raw_global_fn, raw_us_fn) in FILENAMES.items():
-        # Maintain a list of regions
         all_regions: set[str] = set()
 
         # Open input and output .csv files
         # First, open global files and filter for Carribean countries and states
+        console_info(f"\"{raw_global_fn}\": started processing...")
+
+        # Read through input global file and write to output
         with open(gen_fn, "w+") as file_out, open(raw_global_fn, "r") as file_in:
             out = writer(file_out)
             for i, row in enumerate(reader(file_in, delimiter=",")):
                 if i == 0 or not GLOBAL_CARIBBEAN.isdisjoint(row[0:2]):
                     out.writerow(row)
-                    if i != 0:
-                        # Add Carribean country or state to list of regions
+                    if i == 0:
+                        num_days_global = len(row[4:])
+                    else:
                         all_regions.add(row[int(row[1] in GLOBAL_CARIBBEAN)])
-            
-            # Output completion of global .csv processing
-            console_info(f"\"{raw_global_fn}\": completed processing.")
 
-        # Output warning any countries that are not in the JHU time series
+        # Output any warnings and completion of global .csv processing
         for country in GLOBAL_CARIBBEAN.difference(all_regions):
-            console_warn(f"\"{raw_global_fn}\": country name \"{country}\" not found.")
+            console_warn(f"\"{raw_global_fn}\": country name \"{country}\" not found")
+        console_info(f"\"{raw_global_fn}\": done processing")
+
+        all_regions: set[str] = set()
+        pr_raw_data: list[list[str]] = []
 
         # Second, open U.S. files and filter for U.S. territories, including
         # American Samoa, Guam and the Northern Mariana Islands
-        all_regions: set[str] = set()
-        # For Puerto Rico, multiple rows on a per-province basis are combined
-        pr_raw_data: list[list[str]] = []
-
+        console_info(f"\"{raw_us_fn}\": started processing...")
         with open(gen_fn, "a") as file_out, open(raw_us_fn, "r") as file_in:
             out = writer(file_out)
             for i, row in enumerate(reader(file_in, delimiter=",")):
-                if i == 0 or row[6] not in US_TERRITORIES:
+                if i == 0:
+                    idx = row.index("1/22/20")
+                    num_days_us = len(row[idx:])
+                    if num_days_global != num_days_us:
+                        console_warn(f"\"{raw_us_fn}\": dates do not align")
                     continue
-                if row[6] == "Puerto Rico":
-                    pr_raw_data.append(row[11:])
-                else:
-                    out.writerow(row[6:10] + row[11:])
+                if row[6] not in US_TERRITORIES:
+                    continue
                 
-                # Add U.S. territory to list of regions
+                # For Puerto Rico, combine multiple rows listed on a per-province basis
+                # For the rest, write to output
+                if row[6] == "Puerto Rico":
+                    pr_raw_data.append(row[idx:])
+                else:
+                    out.writerow(row[6:10] + row[idx:])
+
                 all_regions.add(row[6])
 
-            # Calculate and write Puerto Rico data
+            # Calculate and write Puerto Rico data to output
             if "Puerto Rico" in US_TERRITORIES:
                 out.writerow(
                     ["Puerto Rico", "US" , "18.2208", "-66.5901"] +
                     [sum(int(d) for d in data) for data in zip(*pr_raw_data)]
                 )
-            
-            # Output completion of U.S. .csv processing
-            console_info(f"\"{raw_us_fn}\": completed processing.")
 
-        # Output warning any countries that are not in the JHU time series
+        # Output any warnings and completion of U.S. .csv processing
         for country in US_TERRITORIES.difference(all_regions):
-            console_warn(f"\"{raw_us_fn}\": country name \"{country}\" not found.")
+            console_warn(f"\"{raw_us_fn}\": country name \"{country}\" not found")
+        console_info(f"\"{raw_us_fn}\": done processing")
 
         # Output completion of Caribbean .csv generation
-        console_done(f"\"{gen_fn}\": completed exporting.")
+        console_done(f"\"{gen_fn}\": done exporting")
         
