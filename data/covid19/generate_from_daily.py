@@ -94,7 +94,7 @@ if __name__ == "__main__":
                             new_row.append(int(row[idx]) - prev_val)
                             prev_val = int(row[idx])
                         out.writerow(new_row)
-                
+
             # Output completion of file generation
             console_done(f"\"{out_m_fn}\": done compiling")
             console_done(f"\"{out_y_fn}\": done compiling")
