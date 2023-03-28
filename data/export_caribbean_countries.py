@@ -19,11 +19,11 @@ console_done = lambda msg: print(f"\033[96mDONE:\033[00m {msg}", file=stderr)
 
 # Translation for JHU raw data files to Carribean generated data
 FILENAMES: dict[str, tuple[str, str]] = {
-    "gen/time_series_covid19_confirmed_caribbean.csv": (
+    "covid19/cases_daily.csv": (
         "raw/time_series_covid19_confirmed_global.csv",
         "raw/time_series_covid19_confirmed_US.csv",
     ),
-    "gen/time_series_covid19_deaths_caribbean.csv": (
+    "covid19/deaths_daily.csv": (
         "raw/time_series_covid19_deaths_global.csv",
         "raw/time_series_covid19_deaths_US.csv",
     ),
