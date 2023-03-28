@@ -4,7 +4,7 @@
 Python script for generating Caribbean COVID-19
 confirmed cases and deaths from the JHU raw files.
 --------------------------------------------------
-Created on 02/28/2023. Last updated on 03/27/2023.
+Created on 02/28/2023. Last updated on 03/28/2023.
 Written by Andrei Pascu, Yale College '23.
 --------------------------------------------------
 """
@@ -19,11 +19,11 @@ console_done = lambda msg: print(f"\033[96mDONE:\033[00m {msg}", file=stderr)
 
 # Translation for JHU raw data files to Carribean generated data
 FILENAMES: dict[str, tuple[str, str]] = {
-    "covid19/cases_daily.csv": (
+    "covid19/time_series_covid19_cases.csv": (
         "raw/time_series_covid19_confirmed_global.csv",
         "raw/time_series_covid19_confirmed_US.csv",
     ),
-    "covid19/deaths_daily.csv": (
+    "covid19/time_series_covid19_deaths.csv": (
         "raw/time_series_covid19_deaths_global.csv",
         "raw/time_series_covid19_deaths_US.csv",
     ),
