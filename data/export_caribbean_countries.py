@@ -4,7 +4,7 @@
 Python script for generating Caribbean COVID-19
 confirmed cases and deaths from the JHU raw files.
 --------------------------------------------------
-Created on 02/28/2023. Last updated on 03/07/2023.
+Created on 02/28/2023. Last updated on 03/27/2023.
 Written by Andrei Pascu, Yale College '23.
 --------------------------------------------------
 """
@@ -36,6 +36,7 @@ GLOBAL_CARIBBEAN: set[str] = set([
     "Aruba",
     "Bahamas",
     "Barbados",
+    "Bonaire, Sint Eustatius and Saba",
     "British Virgin Islands",
     "Cayman Islands",
     "Cuba",
@@ -44,21 +45,22 @@ GLOBAL_CARIBBEAN: set[str] = set([
     "Dominican Republic",
     "Grenada",
     "Guadeloupe",
-    "Haiti",
+    # "Haiti",
     "Jamaica",
     "Martinique",
     "Montserrat",
     "Saint Kitts and Nevis",
     "Saint Lucia",
     "Saint Vincent and the Grenadines",
-    "St Martin",
+    "Sint Maarten",
+    # "St Martin",
     "Trinidad and Tobago",
     "Turks and Caicos Islands",
 ])
 US_TERRITORIES: set[str] = set([
-    "American Samoa",
-    "Guam",
-    "Northern Mariana Islands",
+    # "American Samoa",
+    # "Guam",
+    # "Northern Mariana Islands",
     "Puerto Rico",
     "Virgin Islands",
 ])
