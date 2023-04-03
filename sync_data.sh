@@ -15,7 +15,7 @@ for pathname in ./data/countries/*.xlsx; do
     country=${pathname%.xlsx}
     country=${country##*/}
     # Create directory if it does not exist
-    mkdir -p "./code/$country"
+    mkdir -p "./code/analysis/$country"
     # Convert Excel file to .csv
     ssconvert --export-file-per-sheet --export-options "sheet=Data" $pathname "./code/analysis/$country/%s.csv"
     echo "Converted to .csv file: $country.xlsx"
