@@ -50,12 +50,6 @@ def gen_did_plot(
     x = df.loc[df['yr'] >= 2020, x_name]
     y = df.loc[df['yr'] >= 2020, y_name]
     plt.bar(x + bar_offset, predict(x), color=secondary_color, edgecolor='black', width=bar_width)
-    # for i in range(len(x)):
-    #     plt.text(
-    #         2020 + i + bar_offset, y.iloc[i] + text_offset,
-    #         '{:,.0f}'.format(predict(2020 + i) - y.iloc[i]),
-    #         ha='center', rotation='vertical',
-    #     )
 
     # Show data
     plt.bar(df[x_name] + bar_offset, df[y_name], color=primary_color, edgecolor='black', width=bar_width)
