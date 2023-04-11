@@ -4,7 +4,7 @@
 Python file containing all common and frequently
 ran code for the analysis of the Caribbean data.
 --------------------------------------------------
-Created on 04/03/2023. Last updated on 04/03/2023.
+Created on 04/03/2023. Last updated on 04/11/2023.
 Written by Andrei Pascu, Yale College '23.
 --------------------------------------------------
 """
@@ -15,7 +15,7 @@ import statsmodels.api as sm
 
 # Display a pre-pandemic trendline to predict variable
 # outcomes in the absence of the 2020 pandemic in order
-# to highlight the impact of COVID-19.
+# to highlight the impact of COVID-19
 def gen_did_plot(
     df: pd.DataFrame,
     y_name: str,
@@ -28,7 +28,7 @@ def gen_did_plot(
     show_trendline: bool = True,
     bar_width: float = 0.8,
     bar_offset: float = 0,
-):
+) -> list[float]:
     # Add difference-in-differences vertical line
     plt.axvline(x=2019.51, color='black')
 
@@ -47,9 +47,12 @@ def gen_did_plot(
         plt.plot(x, predict(x), color=trendline_color, linestyle='dashed')
 
     # Display post-2020 predictions in the absence of COVID-19
-    x = df.loc[df['yr'] >= 2020, x_name]
-    y = df.loc[df['yr'] >= 2020, y_name]
+    x = df.loc[df[x_name] >= 2020, x_name]
+    y = df.loc[df[x_name] >= 2020, y_name]
     plt.bar(x + bar_offset, predict(x), color=secondary_color, edgecolor='black', width=bar_width)
 
     # Show data
     plt.bar(df[x_name] + bar_offset, df[y_name], color=primary_color, edgecolor='black', width=bar_width)
+
+    # Return delta prediction
+    return [predict(_x) - _y for _x, _y in zip(x, y)]
