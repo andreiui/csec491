@@ -4,7 +4,7 @@
 Python file containing all common and frequently
 ran code for the analysis of the Caribbean data.
 --------------------------------------------------
-Created on 04/03/2023. Last updated on 04/11/2023.
+Created on 04/03/2023. Last updated on 04/12/2023.
 Written by Andrei Pascu, Yale College '23.
 --------------------------------------------------
 """
@@ -12,6 +12,7 @@ Written by Andrei Pascu, Yale College '23.
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
+import statsmodels.formula.api as smf
 
 # Display a pre-pandemic trendline to predict variable
 # outcomes in the absence of the 2020 pandemic in order
@@ -56,3 +57,26 @@ def gen_did_plot(
 
     # Return delta prediction
     return [predict(_x) - _y for _x, _y in zip(x, y)]
+
+def run_covid19_interaction(
+    df: pd.DataFrame,
+    y_name: str,
+):
+    # Copy dataframe and add year indicators
+    _df = pd.DataFrame(df)
+    _df[f"ind_2020"] = (_df["yr"] == 2020)
+    _df[f"ind_2021"] = (_df["yr"] == 2021)
+    _df[f"ind_postpand"] = (_df["yr"] >= 2020)
+    
+    # Create dataframe for coefficient estimates
+    # coef = pd.DataFrame(index=["_COL", "_COL:ind_2020", "_COL:ind_2021"])
+
+    # Run OLS regressions for each COVID-19 statistic
+    for x_name in ("covid19_cases", "covid19_deaths"):
+        reg = smf.ols(
+            formula=f"{y_name} ~ yr + ind_postpand",
+            data=_df,
+        ).fit()
+        print(reg.summary())
+    
+    return None
