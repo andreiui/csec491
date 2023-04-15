@@ -10,6 +10,7 @@ Written by Andrei Pascu, Yale College '23.
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
@@ -75,19 +76,19 @@ def run_covid19_interaction(
     df: pd.DataFrame,
     y_name: str,
 ):
-    # Copy dataframe and add year indicators
-    _df = pd.DataFrame(df)
-    _df[f"ind_2020"] = (_df["yr"] == 2020)
-    _df[f"ind_2021"] = (_df["yr"] == 2021)
-    _df[f"ind_postpand"] = (_df["yr"] >= 2020)
+    # Add year indicators
+    df = pd.DataFrame(df)
+    df[f"ind_2020"] = (df["yr"] == 2020)
+    df[f"ind_2021"] = (df["yr"] == 2021)
+    df[f"ind_postpand"] = (df["yr"] >= 2020)
 
-    for x_name in ("covid19_cases", "covid19_deaths"):
-        reg = smf.ols(
-            formula=f"{y_name} ~ yr + ind_postpand",
-            data=_df,
-        ).fit()
-        print(reg.summary())
-    
+    reg = smf.ols(
+        formula=f"{y_name} ~ yr + covid19_cases + covid19_cases:ind_2021 + covid19_deaths",
+        data=df,
+    ).fit()
+    print(reg.summary())
+
+    plt.show()
     return None
     
-    lm('inbtou_volume ~ yr + ind_postpand + covid19_cases + covid19_deaths + covid19_cases*ind_2020 + covid19_cases*ind_2021')
+    # lm('inbtou_volume ~ yr + ind_postpand + covid19_cases + covid19_deaths + covid19_cases*ind_2020 + covid19_cases*ind_2021')
