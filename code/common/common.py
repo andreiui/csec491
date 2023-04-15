@@ -4,7 +4,7 @@
 Python file containing all common and frequently
 ran code for the analysis of the Caribbean data.
 --------------------------------------------------
-Created on 04/03/2023. Last updated on 04/12/2023.
+Created on 04/03/2023. Last updated on 04/15/2023.
 Written by Andrei Pascu, Yale College '23.
 --------------------------------------------------
 """
@@ -27,36 +27,49 @@ def gen_did_plot(
     secondary_color: str = 'lightblue',
     trendline_color: str = 'darkblue',
     show_trendline: bool = True,
+    show_confidence: bool = True,
     bar_width: float = 0.8,
     bar_offset: float = 0,
-) -> list[float]:
+) -> tuple[float, float]:
+    # Add post-pandemic indicator variable
+    df['ind_postpand'] = (df['yr'] >= 2020)
+
     # Add difference-in-differences vertical line
-    plt.axvline(x=2019.51, color='black')
+    plt.axvline(x=2019.5, color='black')
 
     # Determine pre-pandemic trendline using OLS
-    x = df.loc[df[x_name] < 2020, x_name]
-    y = df.loc[df[x_name] < 2020, y_name]
-    reg = sm.OLS(y, sm.add_constant(x)).fit()
-    alpha, beta = reg.params.const, reg.params[x_name]
-    predict = lambda _x: alpha + beta * _x
-
-    # Add pre-pandemic trendline to plot
-    if show_trendline:
-        x = pd.DataFrame(range(x0 - 1, 2020))
-        plt.plot(x, predict(x), color=trendline_color)
-        x = pd.DataFrame(range(2019, x1 + 2))
-        plt.plot(x, predict(x), color=trendline_color, linestyle='dashed')
+    reg = smf.ols(f"{y_name} ~ {x_name} + ind_postpand", data=df).fit()
+    effect, stderr = reg.params['ind_postpand[T.True]'], reg.bse['ind_postpand[T.True]']
+    predict = lambda _x: reg.params['Intercept'] + reg.params[x_name] * _x
 
     # Display post-2020 predictions in the absence of COVID-19
     x = df.loc[df[x_name] >= 2020, x_name]
-    y = df.loc[df[x_name] >= 2020, y_name]
-    plt.bar(x + bar_offset, predict(x), color=secondary_color, edgecolor='black', width=bar_width)
+    plt.bar(x + bar_offset, predict(x), color=secondary_color, width=bar_width)
 
     # Show data
-    plt.bar(df[x_name] + bar_offset, df[y_name], color=primary_color, edgecolor='black', width=bar_width)
+    plt.bar(df[x_name] + bar_offset, df[y_name], color=primary_color, width=bar_width)
 
-    # Return delta prediction
-    return [predict(_x) - _y for _x, _y in zip(x, y)]
+    if show_trendline:
+        # Show hypothetical trendline in the absence of COVID-19
+        x = list(range(x0 - 1, 2020)) + [2019.5]
+        plt.plot(x, [predict(_x) for _x in x], color=trendline_color)
+        x = [2019.5] + list(range(2020, x1 + 2))
+        plt.plot(x, [predict(_x) for _x in x], color=trendline_color, linestyle='dotted')
+
+        # Show pandemic impact
+        plt.plot(x, [predict(_x) for _x in x] + effect, color=trendline_color)
+
+        # Show confidence band
+        if show_confidence:
+            plt.fill_between(
+                x,
+                [predict(_x) for _x in x] + effect + stderr,
+                [predict(_x) for _x in x] + effect - stderr,
+                color=trendline_color,
+                alpha=0.1,
+            )
+
+    return effect, stderr
 
 def run_covid19_interaction(
     df: pd.DataFrame,
@@ -67,11 +80,7 @@ def run_covid19_interaction(
     _df[f"ind_2020"] = (_df["yr"] == 2020)
     _df[f"ind_2021"] = (_df["yr"] == 2021)
     _df[f"ind_postpand"] = (_df["yr"] >= 2020)
-    
-    # Create dataframe for coefficient estimates
-    # coef = pd.DataFrame(index=["_COL", "_COL:ind_2020", "_COL:ind_2021"])
 
-    # Run OLS regressions for each COVID-19 statistic
     for x_name in ("covid19_cases", "covid19_deaths"):
         reg = smf.ols(
             formula=f"{y_name} ~ yr + ind_postpand",
@@ -80,3 +89,5 @@ def run_covid19_interaction(
         print(reg.summary())
     
     return None
+    
+    lm('inbtou_volume ~ yr + ind_postpand + covid19_cases + covid19_deaths + covid19_cases*ind_2020 + covid19_cases*ind_2021')
