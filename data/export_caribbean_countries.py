@@ -45,7 +45,7 @@ GLOBAL_CARIBBEAN: set[str] = set([
     "Dominican Republic",
     "Grenada",
     "Guadeloupe",
-    # "Haiti",
+    "Haiti",
     "Jamaica",
     "Martinique",
     "Montserrat",
