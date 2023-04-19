@@ -83,12 +83,13 @@ def run_covid19_interaction(
     df[f"ind_postpand"] = (df["yr"] >= 2020)
 
     reg = smf.ols(
-        formula=f"{y_name} ~ yr + covid19_cases + covid19_cases:ind_2021 + covid19_deaths",
+        formula=f"{y_name} ~ covid19_cases + covid19_deaths",
         data=df,
     ).fit()
     print(reg.summary())
-
-    plt.show()
-    return None
     
-    # lm('inbtou_volume ~ yr + ind_postpand + covid19_cases + covid19_deaths + covid19_cases*ind_2020 + covid19_cases*ind_2021')
+    reg = smf.ols(
+        formula=f"{y_name} ~ covid19_mortality",
+        data=df,
+    ).fit()
+    print(reg.summary())
