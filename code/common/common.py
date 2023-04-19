@@ -81,7 +81,7 @@ def run_covid19_interaction(
         data=df,
     ).fit()
     print(reg.summary())
-    
+
     reg = smf.ols(
         formula=f"{y_name} ~ covid19_mortality",
         data=df,
