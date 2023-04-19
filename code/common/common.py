@@ -76,12 +76,6 @@ def run_covid19_interaction(
     df: pd.DataFrame,
     y_name: str,
 ):
-    # Add year indicators
-    df = pd.DataFrame(df)
-    df[f"ind_2020"] = (df["yr"] == 2020)
-    df[f"ind_2021"] = (df["yr"] == 2021)
-    df[f"ind_postpand"] = (df["yr"] >= 2020)
-
     reg = smf.ols(
         formula=f"{y_name} ~ covid19_cases + covid19_deaths",
         data=df,
