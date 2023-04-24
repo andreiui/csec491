@@ -4,7 +4,7 @@
 Python script for generating Caribbean COVID-19
 confirmed cases and deaths from the JHU raw files.
 --------------------------------------------------
-Created on 02/28/2023. Last updated on 03/28/2023.
+Created on 02/28/2023. Last updated on 04/24/2023.
 Written by Andrei Pascu, Yale College '23.
 --------------------------------------------------
 """
