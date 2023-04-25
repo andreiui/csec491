@@ -32,15 +32,17 @@ def gen_did_plot(
     bar_width: float = 0.8,
     bar_offset: float = 0,
 ) -> tuple[float, float]:
+    df = pd.DataFrame(df)
+
     # Add post-pandemic indicator variable
-    df['ind_postpand'] = (df['yr'] >= 2020)
+    df['ind_post'] = (df['yr'] >= 2020)
 
     # Add difference-in-differences vertical line
     plt.axvline(x=2019.5, color='black')
 
     # Determine pre-pandemic trendline using OLS
-    reg = smf.ols(f"{y_name} ~ {x_name} + ind_postpand", data=df).fit()
-    effect, stderr = reg.params['ind_postpand[T.True]'], reg.bse['ind_postpand[T.True]']
+    reg = smf.ols(f"{y_name} ~ {x_name} + ind_post", data=df).fit()
+    effect, stderr = reg.params['ind_post[T.True]'], reg.bse['ind_post[T.True]']
     predict = lambda _x: reg.params['Intercept'] + reg.params[x_name] * _x
 
     # Display post-2020 predictions in the absence of COVID-19
@@ -76,20 +78,31 @@ def gen_did_plot(
 def run_covid19_regression(
     df: pd.DataFrame,
     y_name: str,
+    log_transform: bool = True,
 ):
-    # Add post-pandemic indicator variable
-    df['ind_postpand'] = (df['yr'] >= 2020)
+    df = pd.DataFrame(df)
+    yr_ind_str = ""
 
-    # Run OLS regression with cases and deaths
-    reg = smf.ols(
-        formula=f"{y_name} ~ yr + ind_postpand + covid19_cases + covid19_deaths",
-        data=df,
-    ).fit()
-    print(reg.summary(), "\n")
+    # Add post-pandemic year indicator variables for use in OLS regression
+    for yr in filter(lambda _x: _x >= 2020, df['yr']):
+        df[f'ind_{yr}'] = [1 if _x == yr else 0 for _x in df['yr']]
+        yr_ind_str += f'ind_{yr} + '
+    yr_ind_str = yr_ind_str[:-3]
 
-    # Run OLS regression with mortality
-    reg = smf.ols(
-        formula=f"{y_name} ~ yr + ind_postpand + covid19_mortality",
-        data=df,
-    ).fit()
-    print(reg.summary())
+    # Transform to dependent variable to log for percentage increase interpretation
+    if log_transform:
+        df[f'log_{y_name}'] = np.log(1 + df[y_name])
+
+    # Run OLS regression for COVID-19 cases, deaths and mortality rates
+    for x_name in ("covid19_cases", "covid19_deaths", "covid19_mortality"):
+        df[f'log_{x_name}'] = np.log(1 + df[x_name])
+
+        # Construct appropriate OLS formula
+        formula = (
+            f"log_{y_name} ~ yr + log_{x_name} + log_{x_name}:({yr_ind_str})"
+            if log_transform
+            else f"{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})"
+        )
+
+        # Output regression summary
+        print(smf.ols(formula, df,).fit().summary(), "\n")
