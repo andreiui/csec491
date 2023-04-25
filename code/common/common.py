@@ -4,7 +4,7 @@
 Python file containing all common and frequently
 ran code for the analysis of the Caribbean data.
 --------------------------------------------------
-Created on 04/03/2023. Last updated on 04/15/2023.
+Created on 04/03/2023. Last updated on 04/24/2023.
 Written by Andrei Pascu, Yale College '23.
 --------------------------------------------------
 """
@@ -72,18 +72,24 @@ def gen_did_plot(
 
     return effect, stderr
 
-def run_covid19_interaction(
+# Performs an OLS regression on the given economic variable
+def run_covid19_regression(
     df: pd.DataFrame,
     y_name: str,
 ):
+    # Add post-pandemic indicator variable
+    df['ind_postpand'] = (df['yr'] >= 2020)
+
+    # Run OLS regression with cases and deaths
     reg = smf.ols(
-        formula=f"{y_name} ~ covid19_cases + covid19_deaths",
+        formula=f"{y_name} ~ yr + ind_postpand + covid19_cases + covid19_deaths",
         data=df,
     ).fit()
-    print(reg.summary())
+    print(reg.summary(), "\n")
 
+    # Run OLS regression with mortality
     reg = smf.ols(
-        formula=f"{y_name} ~ covid19_mortality",
+        formula=f"{y_name} ~ yr + ind_postpand + covid19_mortality",
         data=df,
     ).fit()
     print(reg.summary())
