@@ -9,7 +9,7 @@
 # When running this script, manually update the
 # sources file snapshot date and time.
 # --------------------------------------------------
-# Created on 03/01/2023. Last updated on 03/02/2023.
+# Created on 03/01/2023. Last updated on 04/24/2023.
 # Written by Andrei Pascu, Yale College '23.
 # --------------------------------------------------
 #
@@ -21,7 +21,7 @@ url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid
 fns=("time_series_covid19_confirmed_US.csv"      \
      "time_series_covid19_confirmed_global.csv"  \
      "time_series_covid19_deaths_US.csv"         \
-     "time_series_covid19_recovered_global.csv")
+     "time_series_covid19_deaths_global.csv")
 
 # Download each raw file into directory
 for fn in ${fns[@]}; do
