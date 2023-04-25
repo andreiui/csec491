@@ -78,10 +78,10 @@ def gen_did_plot(
 def run_covid19_regression(
     df: pd.DataFrame,
     y_name: str,
-    log_transform: bool = True,
+    log_level: bool = False,
 ):
     df = pd.DataFrame(df)
-    yr_ind_str = ""
+    yr_ind_str = ''
 
     # Add post-pandemic year indicator variables for use in OLS regression
     for yr in filter(lambda _x: _x >= 2020, df['yr']):
@@ -89,20 +89,20 @@ def run_covid19_regression(
         yr_ind_str += f'ind_{yr} + '
     yr_ind_str = yr_ind_str[:-3]
 
-    # Transform to dependent variable to log for percentage increase interpretation
-    if log_transform:
-        df[f'log_{y_name}'] = np.log(1 + df[y_name])
+    # Transform to dependent variable to log for marginal interpretation
+    if log_level:
+        df[f'log_{y_name}'] = np.log(df[y_name])
 
     # Run OLS regression for COVID-19 cases, deaths and mortality rates
-    for x_name in ("covid19_cases", "covid19_deaths", "covid19_mortality"):
-        df[f'log_{x_name}'] = np.log(1 + df[x_name])
+    for x_name in ('covid19_cases', 'covid19_deaths', 'covid19_mortality'):
+        # df[f'log_{x_name}'] = np.log(df[x_name])
 
         # Construct appropriate OLS formula
         formula = (
-            f"log_{y_name} ~ yr + log_{x_name} + log_{x_name}:({yr_ind_str})"
-            if log_transform
-            else f"{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})"
+            f'log_{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})'
+            if log_level
+            else f'{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})'
         )
 
         # Output regression summary
-        print(smf.ols(formula, df,).fit().summary(), "\n")
+        print(smf.ols(formula, df,).fit().summary(), '\n')
