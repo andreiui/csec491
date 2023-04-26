@@ -95,18 +95,11 @@ def run_covid19_regression(
 
     # Run OLS regression for COVID-19 cases, deaths and mortality rates
     for x_name in ('covid19_cases', 'covid19_deaths', 'covid19_mortality'):
-        # Create indicators for formula 
-        indicator_str = (
-            f' + {x_name}:({yr_ind_str})'
-            if yr_ind_str != ''
-            else ''
-        )
-
         # Construct appropriate OLS formula
         formula = (
-            f'log_{y_name} ~ yr + {x_name}{indicator_str}'
+            f'log_{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})'
             if log_level
-            else f'{y_name} ~ yr + {x_name}{indicator_str}'
+            else f'{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})'
         )
 
         # Output regression summary
