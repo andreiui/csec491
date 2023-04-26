@@ -103,11 +103,9 @@ def run_covid19_regression(
         )
 
         # Construct appropriate OLS formula
-        formula = (
-            f'log_{y_name} ~ yr + {x_name}{indicator_str}'
-            if log_level
-            else f'{y_name} ~ yr + {x_name}{indicator_str}'
-        )
+        formula = f'{y_name} ~ yr + {x_name}{indicator_str}'
+        if log_level:
+            formula = 'log_' + formula
 
         # Output regression summary
         print(smf.ols(formula, df,).fit().summary(), '\n')
