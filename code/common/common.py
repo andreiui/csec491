@@ -84,7 +84,7 @@ def run_covid19_regression(
     yr_ind_str = ''
 
     # Add post-pandemic year indicator variables for use in OLS regression
-    for yr in filter(lambda _x: _x >= 2020, df['yr']):
+    for yr in filter(lambda _x: _x >= 2021, df['yr']):
         df[f'ind_{yr}'] = [1 if _x == yr else 0 for _x in df['yr']]
         yr_ind_str += f'ind_{yr} + '
     yr_ind_str = yr_ind_str[:-3]
@@ -95,11 +95,18 @@ def run_covid19_regression(
 
     # Run OLS regression for COVID-19 cases, deaths and mortality rates
     for x_name in ('covid19_cases', 'covid19_deaths', 'covid19_mortality'):
+        # Create indicators for formula 
+        indicator_str = (
+            f' + {x_name}:({yr_ind_str})'
+            if yr_ind_str != ''
+            else ''
+        )
+
         # Construct appropriate OLS formula
         formula = (
-            f'log_{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})'
+            f'log_{y_name} ~ yr + {x_name}{indicator_str}'
             if log_level
-            else f'{y_name} ~ yr + {x_name} + {x_name}:({yr_ind_str})'
+            else f'{y_name} ~ yr + {x_name}{indicator_str}'
         )
 
         # Output regression summary
