@@ -84,7 +84,7 @@ def run_covid19_regression(
     yr_ind_str = ''
 
     # Add post-pandemic year indicator variables for use in OLS regression
-    for yr in filter(lambda _x: _x >= 2021, df['yr']):
+    for yr in filter(lambda _x: _x >= 2020, df['yr']):
         df[f'ind_{yr}'] = [1 if _x == yr else 0 for _x in df['yr']]
         yr_ind_str += f'ind_{yr} + '
     yr_ind_str = yr_ind_str[:-3]
